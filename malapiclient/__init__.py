@@ -1,5 +1,4 @@
 # Packages
-from pydoc import cli
 import requests
 import secrets
 
