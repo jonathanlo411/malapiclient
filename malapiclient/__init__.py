@@ -1,4 +1,5 @@
 # Packages
+from pydoc import cli
 import requests
 import secrets
 
@@ -8,18 +9,14 @@ from errors import *
 class malclient:
     
     ########### Meta ###########
-    def __init__(self, client_id, **kwargs):
+    def __init__(self, client_id, client_secret=None, **kwargs):
         # Base
         self.authed = False
         self.cid = client_id
-        self.cis = None
+        self.cis = client_secret
         self.code = None
         self.token = None
-        
-        # If Contains Client Secret
-        if 'client_secret' in kwargs.keys():
-            self.cis = kwargs['client_secret']
-        
+                
     def __repr__(self):
         return f'{"Authorized " if self.authed else ""}MAL API Client, ID: {self.cid}'
     
