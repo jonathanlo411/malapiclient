@@ -7,3 +7,6 @@
 # Tester Files
 b.py
 t.py
+
+# PyCache
+__pycache__
