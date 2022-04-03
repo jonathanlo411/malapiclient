@@ -1,33 +1,54 @@
-import webbrowser
-import secrets
+# Packages
 import requests
+import secrets
+
+# Custom Errors
+from errors import *
 
 class malclient:
     
-    def __init__(self, client_id=None, client_secret=None):
-        self.cid = client_id
-        self.cis = client_secret
+    def __init__(self, client_id, **kwargs):
+        # Base
         self.authed = False
-        if (client_id != None) and (client_secret != None):
-            self.setup()
-            self.authed = True
+        self.cid = client_id
+        self.cis = None
+        self.code = None
+        self.token = None
+        
+        # If Contains Client Secret
+        if 'client_secret' in kwargs.keys():
+            self.cis = kwargs['client_secret']
         
     def __repr__(self):
-        return f'{"Authorized " if self.authed else ""}MAL API Client:\nClient ID: {self.cid}\nClient Secret: {self.cis}'
+        return f'{"Authorized " if self.authed else ""}MAL API Client'
     
-    def setup(self):
-        code = secrets.token_urlsafe(100)[:120]
-        url = f'https://myanimelist.net/v1/oauth2/authorize?response_type=code&client_id={self.cid}&code_challenge={code}'
-        webbrowser.open(url)
-        response = input("Authorisation Code: ")
-
-    def get_anime(self, anime_id):
-        url = f'https://api.myanimelist.net/v2/anime/{anime_id}?fields=id,title,main_picture,alternative_titles,synopsis,mean,rank,popularity,num_list_users,media_type,status,genres,my_list_status,num_episodes,start_season,source,studios'
-        response = requests.get(url, headers= {
-            'Authorization': 'X-MAL-CLIENT-ID'
-        })
+    def add_secret(self, secret):
+        self.cis = secret
+    
+    def get_authorize_link(self):
+        """ Returns the link to authorize
+        """
+        self.code = secrets.token_urlsafe(100)[:120]
+        url = f'https://myanimelist.net/v1/oauth2/authorize?response_type=code&client_id={self.cid}&code_challenge={self.code}'
+        return url
+    
+    def generate_token(self, authorisation_code):
+        """ Generates MAL User token (via ZeroCrystal)
+        """
+        if self.cis == None:
+            raise NoClientSecretError
+        url = 'https://myanimelist.net/v1/oauth2/token'
+        data = {
+            'client_id': self.cid,
+            'client_secret': self.cis,
+            'code': authorisation_code,
+            'code_verifier': self.code,
+            'grant_type': 'authorization_code'
+        }
+        response = requests.post(url, data)
         response.raise_for_status()
-        anime_stats = response.json()
+        token = response.json()
         response.close()
-        return anime_stats
-
+        self.token = token
+        self.authed = True
+        return token
