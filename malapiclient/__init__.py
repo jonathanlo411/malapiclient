@@ -309,9 +309,14 @@ class malclient:
             if "status" in kwargs.keys():
                 url += f"&status={kwargs['status']}"
         # Request
-        response = requests.get(url, headers= {
-            'Authorization': f'Bearer {self.token["access_token"]}'
-        })
+        if user_name == "@me":
+            response = requests.get(url, headers= {
+                'Authorization': f'Bearer {self.token["access_token"]}'
+            })
+        else:
+            response = requests.get(url, headers= {
+                'X-MAL-CLIENT-ID': self.cid
+            })
         response.raise_for_status()
         anime_list = response.json()
         response.close()
@@ -386,3 +391,95 @@ class malclient:
         results = response.json()
         response.close()
         return results
+
+
+    ### User Manga ###
+    def update_manga(self, manga_id: int, **kwargs: iter):
+        """
+        Updates the user's status on the given manga
+        @params manga_id: Manga to be updated
+        """
+        url = f"https://api.myanimelist.net/v2/manga/{manga_id}/my_list_status"
+        # User Specified Scopes
+        data = {}
+        if len(kwargs) != 0:
+            if "status" in kwargs.keys():
+                data['status'] = kwargs['status']
+            if "is_rereading" in kwargs.keys():
+                data['is_rereading'] = kwargs['is_rereading']
+            if "score" in kwargs.keys():
+                data['score'] = kwargs['score']
+            if "num_chapters_read" in kwargs.keys():
+                data['num_chapters_read'] = kwargs['num_chapters_read']
+            if "num_volumes_read" in kwargs.keys():
+                data['num_volumes_read'] = kwargs['num_volumes_read']
+            if "priority" in kwargs.keys():
+                data['priority'] = kwargs['priority']
+            if "num_times_reread" in kwargs.keys():
+                data['num_times_reread'] = kwargs['num_times_reread']
+            if "reread_value" in kwargs.keys():
+                data['reread_value'] = kwargs['reread_value']
+            if "tags" in kwargs.keys():
+                data['tags'] = kwargs['tags']
+            if "comments" in kwargs.keys():
+                data['comments'] = kwargs['comments']
+        else:
+            print("raise error here")
+        # Request
+        response = requests.patch(url, data = data, headers= {
+            'Authorization': f'Bearer {self.token["access_token"]}'
+        })
+        response.raise_for_status()
+        data = response.json()
+        response.close()
+        return data
+    
+    def delete_manga(self, manga_id: str, **kwargs):
+        """
+        Removes the manga from the user's mangalist given the manga ID
+        @params manga_id: ID of the manga
+        """
+        url = f"https://api.myanimelist.net/v2/manga/{manga_id}/my_list_status"
+        # Request
+        response = requests.delete(url, headers = {
+            'Authorization': f'Bearer {self.token["access_token"]}'            
+        })
+        response.raise_for_status()
+        data = response.json()
+        response.close()
+        return data
+        
+    def get_user_manga(self, user_name="@me", **kwargs: iter):
+        """
+        Returns the mangalist of a user. If no user_name is provded, defaults to token owner.
+        @params user_name: User name of manga list to be returned
+        """
+        url = f'https://api.myanimelist.net/v2/users/{user_name}/mangalist'
+        # User Specified Scopes
+        if len(kwargs) != 0:
+            url += "?"
+            if "fields" in kwargs.keys():
+                url += "&fields="
+                for i in kwargs['fields']:
+                    url += f"{i},"
+            if "limit" in kwargs.keys():
+                url += f"&limit={kwargs['limit']}"
+            if "sort" in kwargs.keys():
+                url += f"&sort={kwargs['sort']}"
+            if "offset" in kwargs.keys():
+                url += f"&offset={kwargs['offset']}"
+            if "status" in kwargs.keys():
+                url += f"&status={kwargs['status']}"
+        # Request
+        if user_name == "@me":
+            response = requests.get(url, headers= {
+                'Authorization': f'Bearer {self.token["access_token"]}'
+            })
+        else:
+            response = requests.get(url, headers= {
+                'X-MAL-CLIENT-ID': self.cid
+            })
+        response.raise_for_status()
+        manga_list = response.json()
+        response.close()
+        return manga_list
