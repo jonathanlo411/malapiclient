@@ -483,3 +483,26 @@ class malclient:
         manga_list = response.json()
         response.close()
         return manga_list
+
+
+    ### User Information ###
+    def get_user(self, **kwargs):
+        """
+        Gets user information based from the token
+        """
+        user_name = "@me"
+        url = f'https://api.myanimelist.net/v2/users/{user_name}?fields="anime_statistics"'
+        # User Specified Scopes
+        if "fields" in kwargs.keys():
+            url = f"https://api.myanimelist.net/v2/users/{user_name}?fields="
+            for i in kwargs['fields']:
+                url += f"{i},"
+        # Request
+        response = requests.get(url, headers = {
+            'Authorization': f'Bearer {self.token["access_token"]}'
+        })
+        response.raise_for_status()
+        info = response.json()
+        response.close()
+        return info
+        
