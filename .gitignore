@@ -1,3 +1,9 @@
+# Dev Notebook w/ Checkpoints
 *.ipynb
 
+# Config
 *.json
+
+# Tester Files
+b.py
+t.py
