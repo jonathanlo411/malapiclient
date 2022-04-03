@@ -66,7 +66,8 @@ class malclient:
     
     ########### Authorizing and Tokens ###########
     def get_authorize_link(self):
-        """ Returns the link to authorize
+        """
+        Returns the link to authorize
         """
         self.code = secrets.token_urlsafe(100)[:120]
         url = f'https://myanimelist.net/v1/oauth2/authorize?response_type=code&client_id={self.cid}&code_challenge={self.code}'
@@ -159,7 +160,7 @@ class malclient:
             'X-MAL-CLIENT-ID': self.cid
         })
         response.raise_for_status()
-        token = response.json()
+        anime_stats = response.json()
         response.close()
         return anime_stats
     
