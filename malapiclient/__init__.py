@@ -188,7 +188,7 @@ class malclient:
         response.close()
         return results
     
-    def get_anime_seasonal(self, year, season, **kwargs: iter):
+    def get_anime_seasonal(self, year: int, season: str, **kwargs: iter):
         """
         Returns the anime during the specified season and year
         @params year: Year of season you are searching for
@@ -217,7 +217,7 @@ class malclient:
         response.close()
         return results
 
-    def get_anime_suggestions(self, **kwargs):
+    def get_anime_suggestions(self, **kwargs: iter):
         url = "https://api.myanimelist.net/v2/anime/suggestions"
         # User Specified Scopes
         if len(kwargs) != 0:
@@ -238,3 +238,84 @@ class malclient:
         results = response.json()
         response.close()
         return results
+
+
+    ### User Anime ###
+    def update_anime(self, anime_id: int, **kwargs: iter):
+        url = f"https://api.myanimelist.net/v2/anime/{anime_id}/my_list_status"
+        # User Specified Scopes
+        data = {}
+        if len(kwargs) != 0:
+            if "status" in kwargs.keys():
+                data['status'] = kwargs['status']
+            if "is_rewatching" in kwargs.keys():
+                data['is_rewatching'] = kwargs['is_rewatching']
+            if "score" in kwargs.keys():
+                data['score'] = kwargs['score']
+            if "num_watched_episodes" in kwargs.keys():
+                data['num_watched_episodes'] = kwargs['num_watched_episodes']
+            if "priority" in kwargs.keys():
+                data['priority'] = kwargs['priority']
+            if "num_times_rewatched" in kwargs.keys():
+                data['num_times_rewatched'] = kwargs['num_times_rewatched']
+            if "rewatch_value" in kwargs.keys():
+                data['rewatch_value'] = kwargs['rewatch_value']
+            if "tags" in kwargs.keys():
+                data['tags'] = kwargs['tags']
+            if "comments" in kwargs.keys():
+                data['comments'] = kwargs['comments']
+        else:
+            print("raise error here")
+        # Request
+        response = requests.patch(url, data = data, headers= {
+            'Authorization': f'Bearer {self.token["access_token"]}'
+        })
+        response.raise_for_status()
+        data = response.json()
+        response.close()
+        return data
+    
+    def delete_anime(self, anime_id: str, **kwargs):
+        """
+        Removes the anime from the user's animelist given the anime ID
+        @params anime_id: ID of the anime
+        """
+        url = f"https://api.myanimelist.net/v2/anime/{anime_id}/my_list_status"
+        # Request
+        response = requests.delete(url, headers = {
+            'Authorization': f'Bearer {self.token["access_token"]}'            
+        })
+        response.raise_for_status()
+        data = response.json()
+        response.close()
+        return data
+        
+    def get_user_anime(self, user_name="@me", **kwargs: iter):
+        """
+        Returns the animelist of a user. If no user_name is provded, defaults to token owner.
+        @params user_name: User name of anime list to be returned
+        """
+        url = f'https://api.myanimelist.net/v2/users/{user_name}/animelist'
+        # User Specified Scopes
+        if len(kwargs) != 0:
+            url += "?"
+            if "fields" in kwargs.keys():
+                url += "&fields="
+                for i in kwargs['fields']:
+                    url += f"{i},"
+            if "limit" in kwargs.keys():
+                url += f"&limit={kwargs['limit']}"
+            if "sort" in kwargs.keys():
+                url += f"&sort={kwargs['sort']}"
+            if "offset" in kwargs.keys():
+                url += f"&offset={kwargs['offset']}"
+            if "status" in kwargs.keys():
+                url += f"&status={kwargs['status']}"
+        # Request
+        response = requests.get(url, headers= {
+            'Authorization': f'Bearer {self.token["access_token"]}'
+        })
+        response.raise_for_status()
+        anime_list = response.json()
+        response.close()
+        return anime_list
