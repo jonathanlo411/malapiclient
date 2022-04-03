@@ -319,3 +319,73 @@ class malclient:
         anime_list = response.json()
         response.close()
         return anime_list
+
+
+    ### Manga ###
+    def search_manga(self, query: str, **kwargs: iter):
+        """
+        Returns the results of an manga search
+        @params query: What you want to search
+        """
+        url = f"https://api.myanimelist.net/v2/manga?q={query}"
+        # User Specified Scopes
+        if "fields" in kwargs.keys():
+            url += "&fields="
+            for i in kwargs['fields']:
+                url += f"{i},"
+        if "limit" in kwargs.keys():
+            url += f"&limit={kwargs['limit']}"
+        if "offset" in kwargs.keys():
+            url += f"&offset={kwargs['offset']}"
+        # Request
+        response = requests.get(url, headers= {
+            'X-MAL-CLIENT-ID': self.cid
+        })
+        response.raise_for_status()
+        results = response.json()
+        response.close()
+        return results
+    
+    def get_manga_details(self, manga_id: str, **kwargs: iter):
+        """
+        Returns manga details given
+        @params manga_id: ID of the manga
+        """
+        url = f'https://api.myanimelist.net/v2/manga/{manga_id}?fields=id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,num_list_users,num_scoring_users,nsfw,created_at,updated_at,media_type,status,genres,my_list_status,num_episodes,start_season,broadcast,source,average_episode_duration,rating,pictures,background,related_anime,related_manga,recommendations,studios,statistics'
+        # User Specified Scopes
+        if "fields" in kwargs.keys():
+            url = f'https://api.myanimelist.net/v2/manga/{manga_id}?fields='
+            for i in kwargs['fields']:
+                url += f"{i},"
+        # Request
+        response = requests.get(url, headers= {
+            'X-MAL-CLIENT-ID': self.cid
+        })
+        response.raise_for_status()
+        manga_stats = response.json()
+        response.close()
+        return manga_stats
+    
+    def get_manga_ranking(self, ranking_type="all", **kwargs: iter):
+        """
+        Returns the manga rankings
+        @params ranking_type: Type of ranking
+        """
+        url = f"https://api.myanimelist.net/v2/manga/ranking?ranking_type={ranking_type}"
+        # User Specified Scopes
+        if "fields" in kwargs.keys():
+            url += "&fields="
+            for i in kwargs['fields']:
+                url += f"{i},"
+        if "limit" in kwargs.keys():
+            url += f"&limit={kwargs['limit']}"
+        if "offset" in kwargs.keys():
+            url += f"&offset={kwargs['offset']}"
+        # Request
+        response = requests.get(url, headers= {
+            'X-MAL-CLIENT-ID': self.cid
+        })
+        response.raise_for_status()
+        results = response.json()
+        response.close()
+        return results
