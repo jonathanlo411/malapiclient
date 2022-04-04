@@ -3,7 +3,7 @@ import requests
 import secrets
 
 # Custom Errors
-from errors import *
+from .errors import *
 
 class malclient:
     

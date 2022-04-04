@@ -4,8 +4,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="malapiclient",
-    version="0.1.0",
+    name="malwrapper",
+    version="0.1.1",
     author="Jonathan Lo",
     author_email="jonathanlo411@gmail.com",
     description="A client to utilize MyAnimeList's APIs",
