@@ -10,3 +10,8 @@ t.py
 
 # PyCache
 __pycache__
+
+# PyPI Dist Packaging
+malwrapper.egg-info
+dist
+build
