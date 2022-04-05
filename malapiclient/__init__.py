@@ -71,9 +71,10 @@ class malclient:
     
     def generate_token(self, authorisation_code: str):
         """
-        Generates MAL User token (via ZeroCrystal)
+        Generates MAL User token (modified from ZeroCrystal)
         @params authorisation_code: Code returned after redirected from the auth URL
         """
+        # Need Client Secret to generate token
         if self.cis == None:
             raise NoClientSecretError
         url = 'https://myanimelist.net/v1/oauth2/token'
@@ -214,6 +215,9 @@ class malclient:
         return results
 
     def get_anime_suggestions(self, **kwargs: iter):
+        # Not Authed
+        if not self.authed:
+            raise NeedAuthentificationError
         url = "https://api.myanimelist.net/v2/anime/suggestions"
         # User Specified Scopes
         if len(kwargs) != 0:
@@ -238,6 +242,9 @@ class malclient:
 
     ### User Anime ###
     def update_anime(self, anime_id: int, **kwargs: iter):
+        # Not Authed:
+        if not self.authed:
+            raise NeedAuthentificationError
         url = f"https://api.myanimelist.net/v2/anime/{anime_id}/my_list_status"
         # User Specified Scopes
         data = {}
@@ -291,6 +298,9 @@ class malclient:
         Returns the animelist of a user. If no user_name is provded, defaults to token owner.
         @params user_name: User name of anime list to be returned
         """
+        # Need auth if querying for @me
+        if user_name == "@me" and not self.authed:
+            raise NeedAuthentificationError
         url = f'https://api.myanimelist.net/v2/users/{user_name}/animelist'
         # User Specified Scopes
         if len(kwargs) != 0:
@@ -398,6 +408,9 @@ class malclient:
         Updates the user's status on the given manga
         @params manga_id: Manga to be updated
         """
+        # Need auth
+        if not self.authed:
+            raise NeedAuthentificationError
         url = f"https://api.myanimelist.net/v2/manga/{manga_id}/my_list_status"
         # User Specified Scopes
         data = {}
@@ -438,6 +451,9 @@ class malclient:
         Removes the manga from the user's mangalist given the manga ID
         @params manga_id: ID of the manga
         """
+        # Need auth
+        if not self.authed:
+            raise NeedAuthentificationError
         url = f"https://api.myanimelist.net/v2/manga/{manga_id}/my_list_status"
         # Request
         response = requests.delete(url, headers = {
@@ -453,6 +469,9 @@ class malclient:
         Returns the mangalist of a user. If no user_name is provded, defaults to token owner.
         @params user_name: User name of manga list to be returned
         """
+        # Need auth if querying for @me
+        if user_name == '@me' and not self.authed:
+            raise NeedAuthentificationError
         url = f'https://api.myanimelist.net/v2/users/{user_name}/mangalist'
         # User Specified Scopes
         if len(kwargs) != 0:
@@ -489,6 +508,9 @@ class malclient:
         """
         Gets user information based from the token
         """
+        # Need auth
+        if not self.authed:
+            raise NeedAuthentificationError
         user_name = "@me"
         url = f'https://api.myanimelist.net/v2/users/{user_name}?fields="anime_statistics"'
         # User Specified Scopes
