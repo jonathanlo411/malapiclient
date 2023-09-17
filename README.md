@@ -1,5 +1,5 @@
 # MAL API Client
-*_Still WIP; Once released, will create tag deployments and CI/CD pipeline directly to PyPI_
+*_This project is no longer maintained. See other projects like [MAL API Client Upgraded](https://github.com/ModerNews/MAL-API-Client-Upgraded)_
 
 Client to Utilize MyAnimeList APIs. Full original API documentation [here](https://myanimelist.net/apiconfig/references/api/v2)
 
